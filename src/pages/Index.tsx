@@ -5,6 +5,7 @@ import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import { UploadSection } from "@/components/UploadSection";
 import { WishesSection } from "@/components/WishesSection";
 import { Footer } from "@/components/Footer";
+import { MusicToggle } from "@/components/MusicToggle";
 
 const Index = () => {
   return (
@@ -18,6 +19,7 @@ const Index = () => {
         <WishesSection />
       </main>
       <Footer />
+      <MusicToggle />
     </div>
   );
 };
