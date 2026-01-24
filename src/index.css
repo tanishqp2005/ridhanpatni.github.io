@@ -2,87 +2,112 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap');
+
+/* Baby Birthday Celebration Design System - Pastel & Playful */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Warm cream background */
+    --background: 40 50% 97%;
+    --foreground: 340 30% 25%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Soft pink card */
+    --card: 350 60% 98%;
+    --card-foreground: 340 30% 25%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 350 60% 98%;
+    --popover-foreground: 340 30% 25%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Soft coral pink */
+    --primary: 350 80% 70%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Baby blue */
+    --secondary: 200 70% 85%;
+    --secondary-foreground: 200 50% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted: Soft lavender */
+    --muted: 270 40% 94%;
+    --muted-foreground: 270 20% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Mint green */
+    --accent: 160 50% 85%;
+    --accent-foreground: 160 40% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 350 30% 88%;
+    --input: 350 30% 88%;
+    --ring: 350 80% 70%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
+
+    /* Custom baby theme colors */
+    --baby-pink: 350 80% 85%;
+    --baby-blue: 200 70% 85%;
+    --baby-yellow: 45 90% 85%;
+    --baby-mint: 160 50% 85%;
+    --baby-lavender: 270 50% 88%;
+    --baby-coral: 15 80% 80%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(350 80% 92%) 0%, hsl(200 70% 92%) 50%, hsl(45 90% 92%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(350 60% 98%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(350 80% 85%) 0%, hsl(15 80% 80%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(350 30% 70% / 0.2);
+    --shadow-card: 0 8px 30px -8px hsl(350 30% 60% / 0.15);
+    --shadow-float: 0 20px 50px -15px hsl(350 30% 50% / 0.2);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 340 30% 8%;
+    --foreground: 350 30% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 340 25% 12%;
+    --card-foreground: 350 30% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 340 25% 12%;
+    --popover-foreground: 350 30% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 350 70% 65%;
+    --primary-foreground: 340 30% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 200 50% 25%;
+    --secondary-foreground: 200 70% 90%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 340 20% 18%;
+    --muted-foreground: 340 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 160 40% 25%;
+    --accent-foreground: 160 50% 90%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 340 20% 20%;
+    --input: 340 20% 20%;
+    --ring: 350 70% 65%;
+
+    --baby-pink: 350 60% 35%;
+    --baby-blue: 200 50% 35%;
+    --baby-yellow: 45 70% 35%;
+    --baby-mint: 160 40% 30%;
+    --baby-lavender: 270 40% 35%;
+    --baby-coral: 15 60% 40%;
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +125,88 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-nunito;
+    background: var(--gradient-hero);
+    background-attachment: fixed;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-fredoka;
+  }
+}
+
+@layer components {
+  .card-baby {
+    @apply rounded-3xl p-6 bg-card;
+    box-shadow: var(--shadow-card);
+    background: var(--gradient-card);
+  }
+
+  .btn-baby {
+    @apply rounded-full px-8 py-3 font-fredoka font-medium transition-all duration-300;
+    background: var(--gradient-accent);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .btn-baby:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-float);
+  }
+
+  .timeline-dot {
+    @apply w-6 h-6 rounded-full border-4 border-primary bg-background;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .confetti-piece {
+    @apply absolute w-3 h-3 rounded-sm;
+  }
+
+  .floating {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .bounce-slow {
+    animation: bounce-slow 2s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--baby-coral)) 50%, hsl(var(--baby-yellow)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-baby-pink { background-color: hsl(var(--baby-pink)); }
+  .bg-baby-blue { background-color: hsl(var(--baby-blue)); }
+  .bg-baby-yellow { background-color: hsl(var(--baby-yellow)); }
+  .bg-baby-mint { background-color: hsl(var(--baby-mint)); }
+  .bg-baby-lavender { background-color: hsl(var(--baby-lavender)); }
+  .bg-baby-coral { background-color: hsl(var(--baby-coral)); }
+
+  .shadow-baby { box-shadow: var(--shadow-soft); }
+  .shadow-baby-card { box-shadow: var(--shadow-card); }
+  .shadow-baby-float { box-shadow: var(--shadow-float); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-5px) scale(1.02); }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes balloon-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
 }
