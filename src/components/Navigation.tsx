@@ -1,31 +1,43 @@
 import { motion } from "framer-motion";
-import { Home, Calendar, Upload, Heart, Menu, X } from "lucide-react";
+import { Home, Calendar, Upload, Heart, Menu, X, Image } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface NavLinkProps {
   href: string;
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
+  isRoute?: boolean;
 }
 
-const NavLink = ({ href, icon, label, onClick }: NavLinkProps) => (
-  <motion.a
-    href={href}
-    onClick={(e) => {
-      e.preventDefault();
-      onClick();
+const NavLink = ({ href, icon, label, onClick, isRoute }: NavLinkProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onClick();
+    if (isRoute) {
+      navigate(href);
+    } else {
       const element = document.querySelector(href);
       element?.scrollIntoView({ behavior: "smooth" });
-    }}
-    className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm shadow-baby hover:shadow-baby-card transition-all duration-300 text-foreground font-medium"
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-  >
-    {icon}
-    <span className="hidden md:inline">{label}</span>
-  </motion.a>
-);
+    }
+  };
+
+  return (
+    <motion.a
+      href={href}
+      onClick={handleClick}
+      className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm shadow-baby hover:shadow-baby-card transition-all duration-300 text-foreground font-medium"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      {icon}
+      <span className="hidden md:inline">{label}</span>
+    </motion.a>
+  );
+};
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,6 +47,7 @@ export const Navigation = () => {
     { href: "#milestones", icon: <Calendar size={18} />, label: "Milestones" },
     { href: "#upload", icon: <Upload size={18} />, label: "Upload" },
     { href: "#wishes", icon: <Heart size={18} />, label: "Wishes" },
+    { href: "/gallery", icon: <Image size={18} />, label: "Gallery", isRoute: true },
   ];
 
   return (
