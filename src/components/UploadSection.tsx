@@ -60,6 +60,7 @@ export const UploadSection = () => {
             memory_message: message.trim() || null,
             file_url: publicUrl,
             file_type: fileType,
+            approved: true,
           });
 
         if (dbError) throw dbError;
