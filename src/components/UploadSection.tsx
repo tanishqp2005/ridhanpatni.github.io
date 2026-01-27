@@ -1,12 +1,13 @@
 import { motion } from "framer-motion";
 import { Upload, Image, Video, X, Check, Loader2 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { DomeGallery } from "@/components/DomeGallery";
 
 export const UploadSection = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -227,7 +228,7 @@ export const UploadSection = () => {
           </div>
         </motion.div>
 
-        {/* Gallery */}
+        {/* Dome Gallery */}
         {approvedUploads && approvedUploads.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -237,36 +238,24 @@ export const UploadSection = () => {
             <h3 className="text-2xl font-fredoka font-semibold text-foreground text-center mb-8">
               Family Gallery 📸
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {approvedUploads.map((upload, index) => (
-                <motion.div
-                  key={upload.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className="relative aspect-square rounded-2xl overflow-hidden bg-card shadow-baby-card group"
-                >
-                  {upload.file_type === "video" ? (
-                    <video
-                      src={upload.file_url}
-                      className="w-full h-full object-cover"
-                      controls
-                    />
-                  ) : (
-                    <img
-                      src={upload.file_url}
-                      alt={`Memory from ${upload.uploader_name}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  )}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-                    <p className="text-white text-sm font-medium truncate">
-                      {upload.uploader_name}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="w-full h-[500px] md:h-[600px] lg:h-[700px] rounded-3xl overflow-hidden bg-gradient-to-b from-baby-pink/20 to-baby-blue/20">
+              <DomeGallery
+                images={approvedUploads
+                  .filter((upload) => upload.file_type === "image")
+                  .map((upload) => ({
+                    src: upload.file_url,
+                    alt: `Memory from ${upload.uploader_name}`
+                  }))}
+                overlayBlurColor="hsl(350, 60%, 95%)"
+                imageBorderRadius="20px"
+                openedImageBorderRadius="24px"
+                openedImageWidth="300px"
+                openedImageHeight="400px"
+                grayscale={false}
+                fit={0.6}
+                minRadius={400}
+                segments={25}
+              />
             </div>
           </motion.div>
         )}
