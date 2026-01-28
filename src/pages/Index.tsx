@@ -5,10 +5,12 @@ import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import { UploadSection } from "@/components/UploadSection";
 import { Footer } from "@/components/Footer";
 import { MusicToggle } from "@/components/MusicToggle";
+import { FloatingBalls } from "@/components/FloatingBalls";
 
 const Index = () => {
   return (
     <div className="min-h-screen relative overflow-x-hidden">
+      <FloatingBalls />
       <Confetti />
       <Navigation />
       <main>
