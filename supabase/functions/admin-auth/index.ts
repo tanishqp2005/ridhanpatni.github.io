@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { action, password, uploadId } = await req.json();
+    const { action, password, uploadId, milestoneId, fileUrl, fileType } = await req.json();
     const adminPassword = Deno.env.get("ADMIN_PASSWORD");
 
     if (!adminPassword || password !== adminPassword) {
@@ -79,6 +79,69 @@ Deno.serve(async (req) => {
         .from("family_uploads")
         .delete()
         .eq("id", uploadId);
+
+      if (error) throw error;
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Milestone actions
+    if (action === "list_milestones") {
+      const { data, error } = await supabase
+        .from("milestones")
+        .select("*, milestone_media(*)")
+        .order("month_number", { ascending: true });
+
+      if (error) throw error;
+
+      return new Response(
+        JSON.stringify({ milestones: data }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "add_milestone_media" && milestoneId && fileUrl && fileType) {
+      const { data, error } = await supabase
+        .from("milestone_media")
+        .insert({
+          milestone_id: milestoneId,
+          file_url: fileUrl,
+          file_type: fileType,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return new Response(
+        JSON.stringify({ success: true, media: data }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "delete_milestone_media" && uploadId) {
+      const { error } = await supabase
+        .from("milestone_media")
+        .delete()
+        .eq("id", uploadId);
+
+      if (error) throw error;
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "update_milestone_caption" && milestoneId) {
+      const { caption } = await req.json().catch(() => ({}));
+      const { error } = await supabase
+        .from("milestones")
+        .update({ caption: caption || null, updated_at: new Date().toISOString() })
+        .eq("id", milestoneId);
 
       if (error) throw error;
 
