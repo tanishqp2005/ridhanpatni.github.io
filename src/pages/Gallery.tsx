@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Image, Loader2 } from "lucide-react";
+import { ArrowLeft, Image, Video, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
 
 const Gallery = () => {
   const { data: uploads, isLoading } = useQuery({
@@ -18,6 +19,14 @@ const Gallery = () => {
       return data;
     },
   });
+
+  const { photos, videos } = useMemo(() => {
+    if (!uploads) return { photos: [], videos: [] };
+    return {
+      photos: uploads.filter((u) => u.file_type === "image"),
+      videos: uploads.filter((u) => u.file_type === "video"),
+    };
+  }, [uploads]);
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -81,47 +90,93 @@ const Gallery = () => {
           </motion.div>
         )}
 
-        {/* Gallery Grid */}
-        {uploads && uploads.length > 0 && (
-          <motion.div
+        {/* Photos Section */}
+        {photos.length > 0 && (
+          <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+            className="mb-16"
           >
-            {uploads.map((upload, index) => (
-              <motion.div
-                key={upload.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className="relative aspect-square rounded-2xl overflow-hidden bg-card shadow-baby-card group"
-              >
-                {upload.file_type === "video" ? (
-                  <video
-                    src={upload.file_url}
-                    className="w-full h-full object-cover"
-                    controls
-                  />
-                ) : (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-baby-pink rounded-full flex items-center justify-center">
+                <Image size={20} className="text-primary" />
+              </div>
+              <h2 className="text-2xl md:text-3xl font-fredoka font-bold text-foreground">
+                Photos ({photos.length})
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {photos.map((upload, index) => (
+                <motion.div
+                  key={upload.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="relative aspect-square rounded-2xl overflow-hidden bg-card shadow-baby-card group"
+                >
                   <img
                     src={upload.file_url}
                     alt={`Memory from ${upload.uploader_name}`}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                )}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <p className="text-white font-medium truncate">
-                    {upload.uploader_name}
-                  </p>
-                  {upload.memory_message && (
-                    <p className="text-white/80 text-sm truncate">
-                      {upload.memory_message}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <p className="text-white font-medium truncate">
+                      {upload.uploader_name}
                     </p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                    {upload.memory_message && (
+                      <p className="text-white/80 text-sm truncate">
+                        {upload.memory_message}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Videos Section */}
+        {videos.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-baby-blue rounded-full flex items-center justify-center">
+                <Video size={20} className="text-secondary-foreground" />
+              </div>
+              <h2 className="text-2xl md:text-3xl font-fredoka font-bold text-foreground">
+                Videos ({videos.length})
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {videos.map((upload, index) => (
+                <motion.div
+                  key={upload.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="relative aspect-video rounded-2xl overflow-hidden bg-card shadow-baby-card"
+                >
+                  <video
+                    src={upload.file_url}
+                    className="w-full h-full object-cover"
+                    controls
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 pointer-events-none">
+                    <p className="text-white font-medium truncate">
+                      {upload.uploader_name}
+                    </p>
+                    {upload.memory_message && (
+                      <p className="text-white/80 text-sm truncate">
+                        {upload.memory_message}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
         )}
       </div>
     </div>
