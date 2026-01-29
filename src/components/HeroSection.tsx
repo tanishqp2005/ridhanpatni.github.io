@@ -1,8 +1,15 @@
 import { motion } from "framer-motion";
 import { Cake, Sparkles, Star } from "lucide-react";
 import heroCelebration from "@/assets/hero-celebration.jpg";
+import { useConfetti } from "@/hooks/useConfetti";
 
 export const HeroSection = () => {
+  const { triggerConfetti } = useConfetti();
+
+  const handleHeadingClick = () => {
+    triggerConfetti();
+  };
+
   return (
     <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 pt-20">
       {/* Background image with overlay */}
@@ -43,12 +50,13 @@ export const HeroSection = () => {
           <Cake size={48} className="text-primary-foreground" />
         </motion.div>
 
-        {/* Main heading */}
+        {/* Main heading - clickable for confetti */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-fredoka font-bold text-gradient mb-6"
+          onClick={handleHeadingClick}
+          className="text-5xl md:text-7xl lg:text-8xl font-fredoka font-bold text-gradient mb-6 cursor-pointer hover:scale-105 transition-transform"
         >
           Happy 1st Birthday!
         </motion.h1>

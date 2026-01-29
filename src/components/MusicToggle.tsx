@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Music, VolumeX } from "lucide-react";
+import { useConfetti } from "@/hooks/useConfetti";
 
 const MUSIC_URL = "https://res.cloudinary.com/dlasynehg/video/upload/v1769271466/Pappu.mp3_rjl4so.mp3";
 
 export const MusicToggle = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { triggerConfetti } = useConfetti();
 
   useEffect(() => {
     audioRef.current = new Audio(MUSIC_URL);
@@ -28,6 +31,11 @@ export const MusicToggle = () => {
       audioRef.current.pause();
     } else {
       audioRef.current.play().catch(console.error);
+      // Trigger confetti on first play
+      if (!hasTriggeredConfetti) {
+        triggerConfetti();
+        setHasTriggeredConfetti(true);
+      }
     }
     setIsPlaying(!isPlaying);
   };

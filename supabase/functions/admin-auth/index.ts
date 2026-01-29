@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { action, password, uploadId, milestoneId, fileUrl, fileType } = await req.json();
+    const { action, password, uploadId, milestoneId, fileUrl, fileType, firstId, caption, photoUrl } = await req.json();
     const adminPassword = Deno.env.get("ADMIN_PASSWORD");
 
     if (!adminPassword || password !== adminPassword) {
@@ -137,11 +137,44 @@ Deno.serve(async (req) => {
     }
 
     if (action === "update_milestone_caption" && milestoneId) {
-      const { caption } = await req.json().catch(() => ({}));
       const { error } = await supabase
         .from("milestones")
         .update({ caption: caption || null, updated_at: new Date().toISOString() })
         .eq("id", milestoneId);
+
+      if (error) throw error;
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Baby Firsts actions
+    if (action === "list_firsts") {
+      const { data, error } = await supabase
+        .from("baby_firsts")
+        .select("*")
+        .order("display_order", { ascending: true });
+
+      if (error) throw error;
+
+      return new Response(
+        JSON.stringify({ firsts: data }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "update_first" && firstId) {
+      const updates: Record<string, string | null> = {};
+      if (caption !== undefined) updates.caption = caption || null;
+      if (photoUrl !== undefined) updates.photo_url = photoUrl || null;
+      updates.updated_at = new Date().toISOString();
+
+      const { error } = await supabase
+        .from("baby_firsts")
+        .update(updates)
+        .eq("id", firstId);
 
       if (error) throw error;
 

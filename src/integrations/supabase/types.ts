@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      baby_firsts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number
+          id: string
+          milestone_key: string
+          milestone_title: string
+          photo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          milestone_key: string
+          milestone_title: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          milestone_key?: string
+          milestone_title?: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       family_uploads: {
         Row: {
           approved: boolean | null
@@ -41,6 +74,27 @@ export type Database = {
           id?: string
           memory_message?: string | null
           uploader_name?: string
+        }
+        Relationships: []
+      }
+      future_letters: {
+        Row: {
+          created_at: string
+          id: string
+          letter_content: string
+          sender_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          letter_content: string
+          sender_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          letter_content?: string
+          sender_name?: string
         }
         Relationships: []
       }
@@ -121,6 +175,30 @@ export type Database = {
           month_label?: string
           month_number?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      voice_notes: {
+        Row: {
+          audio_url: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          sender_name: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          sender_name: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          sender_name?: string
         }
         Relationships: []
       }
