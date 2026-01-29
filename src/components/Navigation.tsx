@@ -45,8 +45,9 @@ export const Navigation = () => {
   const navItems = [
     { href: "#home", icon: <Home size={18} />, label: "Home" },
     { href: "#milestones", icon: <Calendar size={18} />, label: "Milestones" },
+    { href: "#firsts", icon: <Heart size={18} />, label: "Firsts" },
+    { href: "#game", icon: <Heart size={18} />, label: "Game" },
     { href: "#upload", icon: <Upload size={18} />, label: "Upload" },
-    { href: "#wishes", icon: <Heart size={18} />, label: "Wishes" },
     { href: "/gallery", icon: <Image size={18} />, label: "Gallery", isRoute: true },
   ];
 

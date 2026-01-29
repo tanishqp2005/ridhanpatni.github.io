@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Lock, Eye, EyeOff, Check, X, Trash2, Loader2, Image, Video, Calendar, Upload, Plus } from "lucide-react";
+import { Lock, Eye, EyeOff, Check, X, Trash2, Loader2, Image, Video, Calendar, Upload, Plus, Heart, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +34,24 @@ interface Milestone {
   milestone_media: MilestoneMedia[];
 }
 
+interface BabyFirst {
+  id: string;
+  milestone_key: string;
+  milestone_title: string;
+  caption: string | null;
+  photo_url: string | null;
+  display_order: number;
+}
+
 const MONTH_ICONS = ["🍼", "👶", "🌸", "🌈", "☀️", "🌻", "🍂", "🎃", "🦃", "🎄", "⛄", "🎂"];
+const FIRST_ICONS: Record<string, string> = {
+  first_smile: "😊",
+  first_word: "💬",
+  first_step: "👣",
+  first_bath: "🛁",
+  first_festival: "🎉",
+  first_trip: "✈️",
+};
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,9 +60,13 @@ export default function Admin() {
   const [isLoading, setIsLoading] = useState(false);
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [firsts, setFirsts] = useState<BabyFirst[]>([]);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [uploadingMilestone, setUploadingMilestone] = useState<string | null>(null);
+  const [uploadingFirst, setUploadingFirst] = useState<string | null>(null);
+  const [editingCaption, setEditingCaption] = useState<{ id: string; caption: string } | null>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const firstFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +86,7 @@ export default function Admin() {
       toast.success("Welcome, Admin! 🎉");
       fetchUploads();
       fetchMilestones();
+      fetchFirsts();
     } catch {
       toast.error("Authentication failed");
     } finally {
@@ -95,6 +117,19 @@ export default function Admin() {
       setMilestones(data.milestones || []);
     } catch {
       toast.error("Failed to fetch milestones");
+    }
+  };
+
+  const fetchFirsts = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-auth", {
+        body: { action: "list_firsts", password },
+      });
+
+      if (error || data?.error) throw new Error(data?.error || "Failed to fetch");
+      setFirsts(data.firsts || []);
+    } catch {
+      toast.error("Failed to fetch firsts");
     }
   };
 
@@ -168,6 +203,99 @@ export default function Admin() {
       toast.error("Failed to upload media");
     } finally {
       setUploadingMilestone(null);
+    }
+  };
+
+  const handleFirstPhotoUpload = async (firstId: string, files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    setUploadingFirst(firstId);
+    const file = files[0];
+
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `firsts/${firstId}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("birthday-uploads")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("birthday-uploads")
+        .getPublicUrl(filePath);
+
+      const { data, error } = await supabase.functions.invoke("admin-auth", {
+        body: {
+          action: "update_first",
+          password,
+          firstId,
+          photoUrl: publicUrl,
+        },
+      });
+
+      if (error || data?.error) throw new Error(data?.error || "Failed to update");
+
+      toast.success("Photo uploaded! 📸");
+      fetchFirsts();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to upload photo");
+    } finally {
+      setUploadingFirst(null);
+    }
+  };
+
+  const handleFirstCaptionSave = async (firstId: string, caption: string) => {
+    setActionLoading(firstId);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-auth", {
+        body: {
+          action: "update_first",
+          password,
+          firstId,
+          caption,
+        },
+      });
+
+      if (error || data?.error) throw new Error(data?.error || "Failed to update");
+
+      setFirsts((prev) =>
+        prev.map((f) => (f.id === firstId ? { ...f, caption } : f))
+      );
+      setEditingCaption(null);
+      toast.success("Caption saved!");
+    } catch {
+      toast.error("Failed to save caption");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteFirstPhoto = async (firstId: string) => {
+    setActionLoading(firstId);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-auth", {
+        body: {
+          action: "update_first",
+          password,
+          firstId,
+          photoUrl: null,
+        },
+      });
+
+      if (error || data?.error) throw new Error(data?.error || "Failed to delete");
+
+      setFirsts((prev) =>
+        prev.map((f) => (f.id === firstId ? { ...f, photo_url: null } : f))
+      );
+      toast.success("Photo removed");
+    } catch {
+      toast.error("Failed to delete photo");
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -268,14 +396,18 @@ export default function Admin() {
         </motion.div>
 
         <Tabs defaultValue="uploads" className="space-y-6">
-          <TabsList className="bg-card/80 backdrop-blur p-1 rounded-xl">
+          <TabsList className="bg-card/80 backdrop-blur p-1 rounded-xl flex-wrap">
             <TabsTrigger value="uploads" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Image size={18} className="mr-2" />
-              Gallery Uploads
+              Gallery
             </TabsTrigger>
             <TabsTrigger value="milestones" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Calendar size={18} className="mr-2" />
               Milestones
+            </TabsTrigger>
+            <TabsTrigger value="firsts" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Heart size={18} className="mr-2" />
+              Firsts
             </TabsTrigger>
           </TabsList>
 
@@ -542,6 +674,146 @@ export default function Admin() {
                 </div>
                 <p className="text-muted-foreground font-fredoka text-lg">
                   Loading milestones...
+                </p>
+              </motion.div>
+            )}
+          </TabsContent>
+
+          {/* Baby Firsts Tab */}
+          <TabsContent value="firsts">
+            <div className="mb-4">
+              <p className="text-muted-foreground">
+                Manage photos and captions for "The Firsts" section
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {firsts.map((first, index) => (
+                <motion.div
+                  key={first.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card className="overflow-hidden border-2 border-baby-pink/50 bg-card/80">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{FIRST_ICONS[first.milestone_key] || "💫"}</span>
+                        <CardTitle className="font-fredoka text-lg">
+                          {first.milestone_title}
+                        </CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Photo preview */}
+                      <div className="aspect-square relative rounded-xl overflow-hidden bg-muted group">
+                        {first.photo_url ? (
+                          <>
+                            <img
+                              src={first.photo_url}
+                              alt={first.milestone_title}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              onClick={() => handleDeleteFirstPhoto(first.id)}
+                              disabled={actionLoading === first.id}
+                              className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                            >
+                              {actionLoading === first.id ? (
+                                <Loader2 className="animate-spin text-white" size={24} />
+                              ) : (
+                                <Trash2 className="text-white" size={24} />
+                              )}
+                            </button>
+                          </>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center">
+                            <Camera className="w-10 h-10 text-muted-foreground mb-2" />
+                            <p className="text-sm text-muted-foreground">No photo yet</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Caption input */}
+                      {editingCaption?.id === first.id ? (
+                        <div className="flex gap-2">
+                          <Input
+                            value={editingCaption.caption}
+                            onChange={(e) => setEditingCaption({ ...editingCaption, caption: e.target.value })}
+                            placeholder="Add a caption..."
+                            className="flex-1"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => handleFirstCaptionSave(first.id, editingCaption.caption)}
+                            disabled={actionLoading === first.id}
+                          >
+                            {actionLoading === first.id ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingCaption(null)}
+                          >
+                            <X size={16} />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => setEditingCaption({ id: first.id, caption: first.caption || "" })}
+                          className="p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors"
+                        >
+                          {first.caption ? (
+                            <p className="text-sm italic">"{first.caption}"</p>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">Click to add caption...</p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Upload button */}
+                      <input
+                        ref={(el) => (firstFileInputRefs.current[first.id] = el)}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFirstPhotoUpload(first.id, e.target.files)}
+                        className="hidden"
+                      />
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-xl border-dashed border-2"
+                        onClick={() => firstFileInputRefs.current[first.id]?.click()}
+                        disabled={uploadingFirst === first.id}
+                      >
+                        {uploadingFirst === first.id ? (
+                          <>
+                            <Loader2 className="animate-spin mr-2" size={18} />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Camera size={18} className="mr-2" />
+                            {first.photo_url ? "Change Photo" : "Add Photo"}
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {firsts.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16"
+              >
+                <div className="w-20 h-20 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                  <Heart className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground font-fredoka text-lg">
+                  Loading firsts...
                 </p>
               </motion.div>
             )}
