@@ -6,8 +6,10 @@ import { UploadSection } from "@/components/UploadSection";
 import { Footer } from "@/components/Footer";
 import { MusicToggle } from "@/components/MusicToggle";
 import { FloatingBalls } from "@/components/FloatingBalls";
+import { useClickSound } from "@/hooks/useClickSound";
 
 const Index = () => {
+  useClickSound();
   return (
     <div className="min-h-screen relative overflow-x-hidden">
       <FloatingBalls />
