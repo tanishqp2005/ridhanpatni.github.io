@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Image, Video, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMemo } from "react";
+import { FloatingBalls } from "@/components/FloatingBalls";
+import { FloatingBabyElements } from "@/components/FloatingBabyElements";
 
 const Gallery = () => {
   const { data: uploads, isLoading } = useQuery({
@@ -29,8 +31,10 @@ const Gallery = () => {
   }, [uploads]);
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen relative overflow-x-hidden py-8 px-4" style={{ background: "var(--gradient-hero)", backgroundAttachment: "fixed" }}>
+      <FloatingBalls />
+      <FloatingBabyElements />
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
