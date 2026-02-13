@@ -63,16 +63,15 @@ export const FutureLettersSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
-  // Get count of letters (not the content)
+  // Get count of letters (not the content) via secure RPC
   const { data: letterCount } = useQuery({
     queryKey: ["future-letters-count"],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from("future_letters")
-        .select("*", { count: "exact", head: true });
+      const { data, error } = await supabase
+        .rpc("get_future_letters_count");
       
       if (error) throw error;
-      return count || 0;
+      return data || 0;
     },
   });
 
